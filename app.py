@@ -155,9 +155,12 @@ is_scan = st.sidebar.button("Detect")
 
 st.sidebar.header("About")
 st.sidebar.info(
-    "Similar Player Detecor finds the most similar players to the one you search (developed by Hadi Sotudeh <hadisotudeh1992@gmail.com>)."
+    "This app makes use of [EA SPORTS™ FIFA 2020](https://sofifa.com) KPIs to search for similar players to a given one."
 )
-
+st.sidebar.info(
+    "It employs pre-defind conditions such as league, age, and market value combining with [Annoy (Approximate Nearest Neighbors Oh Yeah)](https://github.com/spotify/annoy) to search for points in space that are close to a given query point.")
+st.sidebar.info(
+    "If you want to learn more, contact hadisotudeh1992[at]gmail[dot]com")
 ##############################################################################
 # if detect button is clicked, then show the main components of the dashboard
 

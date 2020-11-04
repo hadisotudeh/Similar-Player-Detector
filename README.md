@@ -1,4 +1,4 @@
-![](https://img.shields.io/github/license/hadisotudeh/similar-player-detection)
+![](https://img.shields.io/github/license/hadisotudeh/similar-player-detector)
 
 # Similar-Player-Detection
 

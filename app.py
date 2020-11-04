@@ -1,5 +1,6 @@
 # coding=utf-8
 # import libraries
+import requests
 import base64
 import subprocess
 import pandas as pd
@@ -13,6 +14,7 @@ warnings.simplefilter("ignore")
 
 # variables
 all_name = "All"
+photo_profile_dir = "profile_photo/"
 
 for file in os.listdir():
     if file.endswith('.png'):
@@ -167,13 +169,6 @@ def filter_positions(row, positions):
     return False
 
 
-def download_photo_url(url):
-    photo_name = "_".join(url.split("/")[-3:])
-    subprocess.call(['wget', '-O', photo_name, '--referer=http://www.sofifa.com/',
-                     url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    return photo_name
-
-
 def upload_local_photo(file):
     file_ = open(file, "rb")
     contents = file_.read()
@@ -182,11 +177,20 @@ def upload_local_photo(file):
     return data_url
 
 
+def download_photo_url(url):
+    photo_name = "_".join(url.split("/")[-3:])
+
+    r = requests.get(url, allow_redirects=True)
+    open(photo_name, 'wb').write(r.content)
+
+    return photo_name
+
+
 def create_table(data, width=100, class_='', image_height=95, image_width=95):
     if len(class_) > 0:
-        table = f'<table class="{class_}" style="width:{width}%">'
+        table = f'<table class="{class_}" style="text-align: center; width:{width}%">'
     else:
-        table = f'<table style="width:{width}%">'
+        table = f'<table style="text-align: center; width:{width}%">'
 
     # create header row
     header_html = '<tr>'
@@ -194,7 +198,7 @@ def create_table(data, width=100, class_='', image_height=95, image_width=95):
         if col == 'photo_url':
             header_html = header_html + '<th>photo</th>'
         else:
-            header_html = header_html + f'<th>{col}</th>'
+            header_html = header_html + f'<th>{col.capitalize()}</th>'
     header_html = header_html + '<tr>'
 
     all_rows_html = ''
@@ -256,8 +260,10 @@ if is_scan:
     target_player, positions = calc_target_player(target_player_name)
     url = target_player['photo_url'].iloc[0]
     local_photo = download_photo_url(url)
-    st.write(f'Target Player : {target_player_name}')
-    st.image(f"{local_photo}")
+    data_url = upload_local_photo(local_photo)
+    st.markdown("**Target Player** :")
+    st.markdown(
+        f'![](data:image/gif;base64,{data_url}) **{target_player_name}**')
     result = scan(target_player, leagues, positions, transfer_fee, wage, age)
-    st.write(f"Top {top_K} most similar players are:")
+    st.markdown(f"**Top _{top_K}_ most similar players are**:")
     create_table(result[show_columns])

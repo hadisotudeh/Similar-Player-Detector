@@ -1,5 +1,7 @@
 # coding=utf-8
 # import libraries
+import base64
+import subprocess
 import pandas as pd
 import streamlit as st
 from annoy import AnnoyIndex
@@ -12,7 +14,11 @@ warnings.simplefilter("ignore")
 # variables
 all_name = "All"
 
-# read df
+for file in os.listdir():
+    if file.endswith('.png'):
+        os.remove(file)
+
+# load data
 
 
 @st.cache(allow_output_mutation=True)
@@ -59,8 +65,8 @@ positions_list = [
     "GK",
 ]
 
-show_columns = ['name', 'photo_url', 'teams', 'league', 'contract', 'positions', 'age', 'height', 'weight',
-                'Overall Rating', 'Potential', 'Value', 'Wage', 'Release Clause', 'player_traits']
+show_columns = ['photo_url', 'name', 'teams', 'league', 'age',
+                'Overall Rating', 'Potential', 'contract', 'Value', 'player_traits']
 
 columns_to_compare = [
     "Potential",
@@ -161,12 +167,58 @@ def filter_positions(row, positions):
     return False
 
 
-@st.cache(allow_output_mutation=True)
-def scan(leagues, transfer_fee, wage, age):
-    df = load_data()
+def download_photo_url(url):
+    photo_name = "_".join(url.split("/")[-3:])
+    subprocess.call(['wget', '-O', photo_name, '--referer=http://www.sofifa.com/',
+                     url], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    return photo_name
 
-    target_player = df.loc[df['name'] == target_player_name]
-    positions = target_player['positions'].iloc[0].split(",")
+
+def upload_local_photo(file):
+    file_ = open(file, "rb")
+    contents = file_.read()
+    data_url = base64.b64encode(contents).decode("utf-8")
+    file_.close()
+    return data_url
+
+
+def create_table(data, width=100, class_='', image_height=95, image_width=95):
+    if len(class_) > 0:
+        table = f'<table class="{class_}" style="width:{width}%">'
+    else:
+        table = f'<table style="width:{width}%">'
+
+    # create header row
+    header_html = '<tr>'
+    for col in data.columns:
+        if col == 'photo_url':
+            header_html = header_html + '<th>photo</th>'
+        else:
+            header_html = header_html + f'<th>{col}</th>'
+    header_html = header_html + '<tr>'
+
+    all_rows_html = ''
+    for row_index in range(len(data)):
+        row_html = '<tr>'
+        row = data.iloc[row_index]
+        for col in data.columns:
+            if col == 'photo_url':
+                local_photo = download_photo_url(row[col])
+                data_url = upload_local_photo(local_photo)
+                row_html = row_html + \
+                    f'<td><img src="data:image/gif;base64,{data_url}" height="{image_height} width="{image_width}"></img></td>'
+            else:
+                row_html = row_html + f'<td>{row[col]}</td>'
+        row_html = row_html + '</tr>'
+        all_rows_html = all_rows_html + row_html
+
+    table = table + header_html + all_rows_html + '</table>'
+    st.markdown(table, unsafe_allow_html=True)
+
+
+@st.cache(allow_output_mutation=True)
+def scan(target_player, leagues, positions, transfer_fee, wage, age):
+    df = load_data()
 
     target_player_KPIs = target_player[columns_to_compare].to_numpy()[0]
 
@@ -193,6 +245,19 @@ def scan(leagues, transfer_fee, wage, age):
     return subset
 
 
+@st.cache(allow_output_mutation=True)
+def calc_target_player(target_player_name):
+    target_player = df.loc[df['name'] == target_player_name]
+    positions = target_player['positions'].iloc[0].split(",")
+    return target_player, positions
+
+
 if is_scan:
-    result = scan(leagues, transfer_fee, wage, age)
-    st.write(result[show_columns])
+    target_player, positions = calc_target_player(target_player_name)
+    url = target_player['photo_url'].iloc[0]
+    local_photo = download_photo_url(url)
+    st.write(f'Target Player : {target_player_name}')
+    st.image(f"{local_photo}")
+    result = scan(target_player, leagues, positions, transfer_fee, wage, age)
+    st.write(f"Top {top_K} most similar players are:")
+    create_table(result[show_columns])

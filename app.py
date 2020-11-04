@@ -17,7 +17,7 @@ all_name = "All"
 
 @st.cache(allow_output_mutation=True)
 def load_data():
-    df = pd.read_csv("data/sofifa2020.csv")
+    df = pd.read_csv("sofifa2020.csv")
     df['name'] = df['name'].apply(lambda name: unidecode(name))
     df["positions_list"] = df["positions"].apply(lambda x: x.split(","))
     df["contract"] = df["contract"].apply(

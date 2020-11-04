@@ -3,4 +3,3 @@ pandas==1.0.5
 annoy==1.17.0
 scrapy==2.4.0
 Unidecode==1.1.1
-slugify==0.0.1

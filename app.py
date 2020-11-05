@@ -22,6 +22,12 @@ for file in os.listdir():
 
 # load data
 
+st.set_page_config(
+    page_title="Similar Player Detector",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
 
 @st.cache(allow_output_mutation=True)
 def load_data():

@@ -128,8 +128,6 @@ st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 ##################################################################
 # sidebar filters
-st.sidebar.title(":male-detective: Similar Player Detector")
-
 st.sidebar.title(":pick: Filters")
 
 st.sidebar.title("Target:")
@@ -149,22 +147,17 @@ leagues = st.sidebar.multiselect(
 age = st.sidebar.slider("Age:", min_value=15, max_value=50, value=30)
 
 transfer_fee = 1000000 * float(
-    st.sidebar.text_input("Maximum Transfer Fee (€M):", "7.5")
+    st.sidebar.text_input("Maximum Transfer Fee (€M):", "30")
 )
-wage = 1000 * float(st.sidebar.text_input("Maximum Wage (€K):", "50"))
+wage = 1000 * float(st.sidebar.text_input("Maximum Wage (€K):", "60"))
 
 top_K = st.sidebar.slider(
-    "K Top Similar Players", min_value=0, max_value=20, value=5
+    "K Top Similar Players", min_value=0, max_value=20, value=10
 )
 
 is_scan = st.sidebar.button("Detect")
 
-st.sidebar.header("About")
-st.sidebar.info(
-    "This app makes use of [EA SPORTS™ FIFA 2020](https://sofifa.com) KPIs to search for similar players to a given one."
-)
-st.sidebar.info(
-    "It employs pre-defind conditions such as league, age, and market value combining with [Annoy (Approximate Nearest Neighbors Oh Yeah)](https://github.com/spotify/annoy) to search for points in space that are close to a given query point.")
+st.sidebar.header("Contact")
 st.sidebar.info(
     "If you want to learn more, contact hadisotudeh1992[at]gmail[dot]com")
 ##############################################################################
@@ -206,6 +199,10 @@ def create_table(data, width=100, class_='', image_height=95, image_width=95):
     for col in data.columns:
         if col == 'photo_url':
             header_html = header_html + '<th>photo</th>'
+        elif col == 'Value':
+            header_html = header_html + '<th>Value (€M)</th>'
+        elif col == 'player_traits':
+            header_html = header_html + '<th>Description</th>'
         else:
             header_html = header_html + f'<th>{col.capitalize()}</th>'
     header_html = header_html + '<tr>'
@@ -220,6 +217,8 @@ def create_table(data, width=100, class_='', image_height=95, image_width=95):
                 data_url = upload_local_photo(local_photo)
                 row_html = row_html + \
                     f'<td><img src="data:image/gif;base64,{data_url}" height="{image_height} width="{image_width}"></img></td>'
+            elif row[col] == None:
+                row_html = row_html + '<td></td>'
             else:
                 row_html = row_html + f'<td>{row[col]}</td>'
         row_html = row_html + '</tr>'
@@ -267,12 +266,21 @@ def calc_target_player(target_player_name):
 
 if is_scan:
     target_player, positions = calc_target_player(target_player_name)
+    target_player_age = target_player['age'].iloc[0]
+    target_player_teams = target_player['teams'].iloc[0]
     url = target_player['photo_url'].iloc[0]
     local_photo = download_photo_url(url)
     data_url = upload_local_photo(local_photo)
-    st.markdown("**Target Player** :")
+    st.title("Target Player:")
     st.markdown(
-        f'![](data:image/gif;base64,{data_url}) **{target_player_name}**')
+        f'![](data:image/gif;base64,{data_url}) **{target_player_name}** - **{target_player_teams}**')
     result = scan(target_player, leagues, positions, transfer_fee, wage, age)
     st.markdown(f"**Top _{top_K}_ most similar players are**:")
+    result['Value'] = result['Value'].apply(lambda v: float(v/1000000))
     create_table(result[show_columns])
+else:
+    st.title(':male-detective: Similar Player Detector')
+    st.subheader(
+        'This app makes use of [EA SPORTS™ FIFA 2020](https://sofifa.com) KPIs to search for similar players to a given one.')
+    st.subheader(
+        "It first applies filters such as league, age, and market value on players. Then, each remaining player is considered as a vector of their KPIs and afterwards [Annoy (Approximate Nearest Neighbors Oh Yeah)](https://github.com/spotify/annoy) is used to to search for players (points) in space that are close to a given query.")

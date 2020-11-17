@@ -283,6 +283,6 @@ else:
     st.subheader(
         'This app makes use of [EA SPORTS™ FIFA 2020](https://sofifa.com) KPIs to search for similar players to a given one.')
     st.subheader(
-        "It first applies filters such as league, age, and market value on players. Then, each remaining player is considered as a vector of their KPIs and afterwards [Annoy (Approximate Nearest Neighbors Oh Yeah)](https://github.com/spotify/annoy) is used to to search for players (points) in space that are close to a given query.")
+        "It first applies filters such as league, age, and market value on players. Then, each remaining player is considered as a vector of their KPIs and afterwards [Annoy (Approximate Nearest Neighbors Oh Yeah)](https://github.com/spotify/annoy) is used to search for players (points) in space that are close to a given query.")
     st.image(
         'annoy.jpg', caption='https://github.com/spotify/annoy')

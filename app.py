@@ -35,7 +35,12 @@ def load_data():
     df['name'] = df['name'].apply(lambda name: unidecode(name))
     df["positions_list"] = df["positions"].apply(lambda x: x.split(","))
     df["contract"] = df["contract"].apply(
-        lambda x: str(x).split(",")[-1].strip())
+        lambda x: int(x) if not math.isnan(x) else 2020)
+    # df["contract"] = df["contract"].astype(int)
+    df['player_hashtags'] = df['player_hashtags'].apply(
+        lambda x: ", ".join([c.replace("#", "") for c in eval(x)])) + df['player_traits'].apply(
+        lambda x: ", ".join([c.replace("(AI)", "") for c in eval(x)]))
+
     return df
 
 
@@ -74,7 +79,7 @@ positions_list = [
 ]
 
 show_columns = ['photo_url', 'name', 'teams', 'league', 'age',
-                'Overall Rating', 'Potential', 'contract', 'Value', 'player_traits']
+                'Overall Rating', 'Potential', 'contract', 'Value', 'player_hashtags']
 
 columns_to_compare = [
     "Potential",
@@ -144,22 +149,22 @@ leagues = st.sidebar.multiselect(
     "League:", [all_name] + league_list, default=default_leagues
 )
 
-age = st.sidebar.slider("Age:", min_value=15, max_value=50, value=30)
+age = st.sidebar.slider("Age:", min_value=15, max_value=50, value=25)
 
 transfer_fee = 1000000 * float(
-    st.sidebar.text_input("Maximum Transfer Fee (€M):", "30")
+    st.sidebar.text_input("Maximum Transfer Fee (€M):", "40")
 )
-wage = 1000 * float(st.sidebar.text_input("Maximum Wage (€K):", "60"))
+wage = 1000 * float(st.sidebar.text_input("Maximum Wage (€K):", "50"))
 
 top_K = st.sidebar.slider(
-    "K Top Similar Players", min_value=0, max_value=20, value=10
+    "K Top Similar Players", min_value=0, max_value=20, value=5
 )
 
 is_scan = st.sidebar.button("Detect")
 
 st.sidebar.header("Contact")
 st.sidebar.info(
-    "If you want to learn more, contact hadisotudeh1992[at]gmail[dot]com")
+    "Send an email to hadisotudeh1992[at]gmail[dot]com")
 ##############################################################################
 # if detect button is clicked, then show the main components of the dashboard
 
@@ -201,7 +206,7 @@ def create_table(data, width=100, class_='', image_height=95, image_width=95):
             header_html = header_html + '<th>photo</th>'
         elif col == 'Value':
             header_html = header_html + '<th>Value (€M)</th>'
-        elif col == 'player_traits':
+        elif col == 'player_hashtags':
             header_html = header_html + '<th>Description</th>'
         else:
             header_html = header_html + f'<th>{col.capitalize()}</th>'

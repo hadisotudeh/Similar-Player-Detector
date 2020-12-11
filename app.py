@@ -91,7 +91,33 @@ positions_list = [
 show_columns = ['photo_url', 'name', 'teams', 'league', 'age',
                 "positions", 'Overall Rating', 'Potential', 'contract', 'Value', 'player_hashtags']
 
-columns_to_compare = [
+default_columns_to_compare = [
+    "Potential",
+    "Crossing",
+    "Finishing",
+    "HeadingAccuracy",
+    "ShortPassing",
+    "Volleys",
+    "Dribbling",
+    "Curve",
+    "BallControl",
+    "Acceleration",
+    "SprintSpeed",
+    "Agility",
+    "Reactions",
+    "Balance",
+    "ShotPower",
+    "Jumping",
+    "Stamina",
+    "Strength",
+    "LongShots",
+    "Aggression",
+    "Positioning",
+    "Vision",
+    "Composure",
+]
+
+possible_columns_to_compare = [
     "Overall Rating",
     "Potential",
     "Crossing",
@@ -170,6 +196,10 @@ transfer_fee = 1000000 * float(
     st.sidebar.text_input("Maximum Transfer Fee (€M):", "100")
 )
 wage = 1000 * float(st.sidebar.text_input("Maximum Wage (€K):", "200"))
+
+columns_to_compare = st.sidebar.multiselect(
+    "KPIs:", possible_columns_to_compare, default=default_columns_to_compare
+)
 
 top_K = st.sidebar.slider(
     "K Top Similar Players", min_value=0, max_value=20, value=10

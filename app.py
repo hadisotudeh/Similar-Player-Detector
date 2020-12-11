@@ -38,7 +38,7 @@ def load_data():
         lambda x: int(x) if not math.isnan(x) else 2020)
     # df["contract"] = df["contract"].astype(int)
     df['player_hashtags'] = df['player_hashtags'].apply(
-        lambda x: ", ".join([c.replace("#", "") for c in eval(x)])) + df['player_traits'].apply(
+        lambda x: ", ".join([c.replace("#", "") for c in eval(x)])) + ", " + df['player_traits'].apply(
         lambda x: ", ".join([c.replace("(AI)", "") for c in eval(x)]))
 
     return df

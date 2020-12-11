@@ -42,7 +42,7 @@ def load_data():
         lambda x: ", ".join([c.replace("#", "").strip() for c in eval(x)]))
 
     df['player_hashtags'] = df['player_hashtags'].apply(
-        lambda row: row.rstrip(','))
+        lambda row: row.rstrip(', '))
     return df
 
 

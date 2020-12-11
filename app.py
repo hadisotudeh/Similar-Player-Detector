@@ -92,6 +92,7 @@ show_columns = ['photo_url', 'name', 'teams', 'league', 'age',
                 "positions", 'Overall Rating', 'Potential', 'contract', 'Value', 'player_hashtags']
 
 columns_to_compare = [
+    "Overall Rating",
     "Potential",
     "Crossing",
     "Finishing",
@@ -166,9 +167,9 @@ positions = st.sidebar.multiselect(
 age = st.sidebar.slider("Age:", min_value=15, max_value=50, value=27)
 
 transfer_fee = 1000000 * float(
-    st.sidebar.text_input("Maximum Transfer Fee (€M):", "75")
+    st.sidebar.text_input("Maximum Transfer Fee (€M):", "100")
 )
-wage = 1000 * float(st.sidebar.text_input("Maximum Wage (€K):", "100"))
+wage = 1000 * float(st.sidebar.text_input("Maximum Wage (€K):", "200"))
 
 top_K = st.sidebar.slider(
     "K Top Similar Players", min_value=0, max_value=20, value=10

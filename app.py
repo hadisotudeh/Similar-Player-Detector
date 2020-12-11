@@ -93,10 +93,8 @@ show_columns = ['photo_url', 'name', 'teams', 'league', 'age',
 
 default_columns_to_compare = [
     "Potential",
-    "Crossing",
     "Finishing",
     "HeadingAccuracy",
-    "ShortPassing",
     "Volleys",
     "Dribbling",
     "Curve",

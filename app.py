@@ -329,7 +329,7 @@ if is_scan:
         f'![](data:image/gif;base64,{data_url}) **{target_player_name}** - **{target_player_teams}**')
     result = scan(target_player, leagues, positions, transfer_fee, wage, age)
     st.markdown(f"**Top _{top_K}_ most similar players are**:")
-    result['Value'] = result['Value'].apply(lambda v: float(v/1000000))
+    result['Value'] = result['Value'].apply(lambda v: f"{float(v/1000000)}")
     create_table(result[show_columns])
 else:
     st.title(':male-detective: Similar Player Detector')

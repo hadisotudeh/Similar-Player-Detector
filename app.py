@@ -37,10 +37,12 @@ def load_data():
     df["contract"] = df["contract"].apply(
         lambda x: int(x) if not math.isnan(x) else 2020)
     # df["contract"] = df["contract"].astype(int)
-    df['player_hashtags'] = df['player_hashtags'].apply(
-        lambda x: ", ".join([c.replace("#", "") for c in eval(x)])) + ", " + df['player_traits'].apply(
-        lambda x: ", ".join([c.replace("(AI)", "") for c in eval(x)]))
+    df['player_hashtags'] = df['player_traits'].apply(
+        lambda x: ", ".join([c.replace("(AI)", "").strip() for c in eval(x)])) + ", " + df['player_hashtags'].apply(
+        lambda x: ", ".join([c.replace("#", "").strip() for c in eval(x)]))
 
+    df['player_hashtags'] = df['player_hashtags'].apply(
+        lambda row: row.rstrip(','))
     return df
 
 
@@ -55,9 +57,14 @@ default_leagues = [
     "English Premier League",
     "German 1. Bundesliga",
     "Holland Eredivisie",
+    "Portuguese Liga ZON SAGRES",
+    "Campeonato Brasileiro Série A",
+    "Argentina Primera División",
+    "Belgian Jupiler Pro League",
+    "English League Championship",
 ]
 
-default_positions = ["ST", "CF", "LF", "RF", "LS", "RS", "LW", "RW"]
+default_positions = ["ST", "CF", "LF", "RF", "LS", "RS"]
 
 positions_list = [
     "LW",
@@ -156,22 +163,25 @@ positions = st.sidebar.multiselect(
     "Position:", positions_list, default=default_positions
 )
 
-age = st.sidebar.slider("Age:", min_value=15, max_value=50, value=25)
+age = st.sidebar.slider("Age:", min_value=15, max_value=50, value=27)
 
 transfer_fee = 1000000 * float(
-    st.sidebar.text_input("Maximum Transfer Fee (€M):", "40")
+    st.sidebar.text_input("Maximum Transfer Fee (€M):", "75")
 )
-wage = 1000 * float(st.sidebar.text_input("Maximum Wage (€K):", "50"))
+wage = 1000 * float(st.sidebar.text_input("Maximum Wage (€K):", "100"))
 
 top_K = st.sidebar.slider(
-    "K Top Similar Players", min_value=0, max_value=20, value=5
+    "K Top Similar Players", min_value=0, max_value=20, value=10
 )
 
 is_scan = st.sidebar.button("Detect")
 
-st.sidebar.header("Contact")
+st.sidebar.image(
+    'agent.jpg', caption='https://www.wikihow.com/Become-a-Football-Agent', use_column_width=True)
+st.sidebar.header("Contact Info")
 st.sidebar.info(
-    "Send an email to hadisotudeh1992[at]gmail[dot]com")
+    "hadisotudeh1992[at]gmail.com")
+
 ##############################################################################
 # if detect button is clicked, then show the main components of the dashboard
 
@@ -231,6 +241,8 @@ def create_table(data, width=100, class_='', image_height=95, image_width=95):
                     f'<td><img src="data:image/gif;base64,{data_url}" height="{image_height} width="{image_width}"></img></td>'
             elif row[col] == None:
                 row_html = row_html + '<td></td>'
+            elif col == "positions":
+                row_html = row_html + f'<td>{", ".join(eval(row[col]))}</td>'
             else:
                 row_html = row_html + f'<td>{row[col]}</td>'
         row_html = row_html + '</tr>'
@@ -252,10 +264,8 @@ def scan(target_player, leagues, positions, transfer_fee, wage, age):
         df = df[df["league"].isin(leagues)]
     df = df[(df["Value"] <= transfer_fee) & (df["Wage"] <= wage)]
 
-    print(positions)
     df["filter_positions"] = df.apply(
         lambda row: filter_positions(row, positions), axis=1)
-    print(df)
     search_space = df.loc[df["filter_positions"] == True]
 
     # calculate ANNOY

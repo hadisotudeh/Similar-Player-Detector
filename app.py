@@ -64,7 +64,7 @@ default_leagues = [
     "English League Championship",
 ]
 
-default_positions = ["ST", "CF", "LF", "RF", "LS", "RS"]
+default_positions = ["ST", "CF", "LF", "RF", "LS", "RS", "RW", "LW"]
 
 positions_list = [
     "LW",

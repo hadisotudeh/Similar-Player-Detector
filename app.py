@@ -281,7 +281,7 @@ def create_table(data, width=100, class_='', image_height=95, image_width=95):
     st.markdown(table, unsafe_allow_html=True)
 
 
-@st.cache(allow_output_mutation=True)
+# @st.cache(allow_output_mutation=True)
 def scan(target_player, leagues, positions, transfer_fee, wage, age):
     df = load_data()
 
@@ -329,7 +329,8 @@ if is_scan:
         f'![](data:image/gif;base64,{data_url}) **{target_player_name}** - **{target_player_teams}**')
     result = scan(target_player, leagues, positions, transfer_fee, wage, age)
     st.markdown(f"**Top _{top_K}_ most similar players are**:")
-    result['Value'] = result['Value'].apply(lambda v: str(v/1000000))
+    result['Value'] = result['Value'].apply(
+        lambda v: str(v/1000000), inplace=True)
     create_table(result[show_columns])
 else:
     st.title(':male-detective: Similar Player Detector')

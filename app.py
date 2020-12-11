@@ -330,7 +330,7 @@ if is_scan:
     result = scan(target_player, leagues, positions, transfer_fee, wage, age)
     st.markdown(f"**Top _{top_K}_ most similar players are**:")
     result['Value'] = result['Value'].apply(
-        lambda v: str(v/1000000), inplace=True)
+        lambda v: str(v/1000000))
     create_table(result[show_columns])
 else:
     st.title(':male-detective: Similar Player Detector')

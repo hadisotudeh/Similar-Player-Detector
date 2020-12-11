@@ -220,7 +220,7 @@ def create_table(data, width=100, class_='', image_height=95, image_width=95):
     header_html = '<tr>'
     for col in data.columns:
         if col == 'photo_url':
-            header_html = header_html + '<th>photo</th>'
+            header_html = header_html + '<th>Photo</th>'
         elif col == 'Value':
             header_html = header_html + '<th>Value (€M)</th>'
         elif col == 'player_hashtags':

@@ -33,7 +33,7 @@ st.set_page_config(
 def load_data():
     df = pd.read_csv("data/sofifa2020.csv")
     df['name'] = df['name'].apply(lambda name: unidecode(name))
-    df["positions_list"] = df["positions"].apply(lambda x: x.split(","))
+    # df["positions_list"] = df["positions"].apply(lambda x: x.split(","))
     df["contract"] = df["contract"].apply(
         lambda x: int(x) if not math.isnan(x) else 2020)
     # df["contract"] = df["contract"].astype(int)
@@ -57,11 +57,14 @@ default_leagues = [
     "Holland Eredivisie",
 ]
 
+default_positions = ["ST", "CF", "LF", "RF", "LS", "RS", "LW", "RW"]
+
 positions_list = [
     "LW",
     "LS",
     "ST",
     "RW",
+    "RS",
     "LF",
     "CF",
     "RF",
@@ -79,7 +82,7 @@ positions_list = [
 ]
 
 show_columns = ['photo_url', 'name', 'teams', 'league', 'age',
-                'Overall Rating', 'Potential', 'contract', 'Value', 'player_hashtags']
+                "positions", 'Overall Rating', 'Potential', 'contract', 'Value', 'player_hashtags']
 
 columns_to_compare = [
     "Potential",
@@ -149,6 +152,10 @@ leagues = st.sidebar.multiselect(
     "League:", [all_name] + league_list, default=default_leagues
 )
 
+positions = st.sidebar.multiselect(
+    "Position:", positions_list, default=default_positions
+)
+
 age = st.sidebar.slider("Age:", min_value=15, max_value=50, value=25)
 
 transfer_fee = 1000000 * float(
@@ -171,7 +178,7 @@ st.sidebar.info(
 
 def filter_positions(row, positions):
     for p in positions:
-        if p in row["positions_list"]:
+        if p in eval(row["positions"]):
             return True
     return False
 
@@ -245,8 +252,10 @@ def scan(target_player, leagues, positions, transfer_fee, wage, age):
         df = df[df["league"].isin(leagues)]
     df = df[(df["Value"] <= transfer_fee) & (df["Wage"] <= wage)]
 
+    print(positions)
     df["filter_positions"] = df.apply(
         lambda row: filter_positions(row, positions), axis=1)
+    print(df)
     search_space = df.loc[df["filter_positions"] == True]
 
     # calculate ANNOY
@@ -265,12 +274,12 @@ def scan(target_player, leagues, positions, transfer_fee, wage, age):
 @st.cache(allow_output_mutation=True)
 def calc_target_player(target_player_name):
     target_player = df.loc[df['name'] == target_player_name]
-    positions = target_player['positions'].iloc[0].split(",")
-    return target_player, positions
+    # positions = target_player['positions'].iloc[0].split(",")
+    return target_player
 
 
 if is_scan:
-    target_player, positions = calc_target_player(target_player_name)
+    target_player = calc_target_player(target_player_name)
     target_player_age = target_player['age'].iloc[0]
     target_player_teams = target_player['teams'].iloc[0]
     url = target_player['photo_url'].iloc[0]
